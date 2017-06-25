@@ -1,47 +1,21 @@
-import sys
-from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit,
-    QTextEdit, QGridLayout, QApplication)
+from PyQt5.QtWidgets import  QFileDialog, QWidget, QApplication, QHBoxLayout, QPushButton
 
 
-class Example(QWidget):
-
+class Window(QWidget):
     def __init__(self):
-        super().__init__()
-
-        self.initUI()
-
-
-    def initUI(self):
-
-        title = QLabel('Title')
-        author = QLabel('Author')
-        review = QLabel('Review')
-
-        titleEdit = QLineEdit()
-        authorEdit = QLineEdit()
-        reviewEdit = QTextEdit()
-
-        grid = QGridLayout()
-        grid.setSpacing(10)
-
-        grid.addWidget(title, 1, 0)
-        grid.addWidget(titleEdit, 1, 1)
-
-        grid.addWidget(author, 2, 0)
-        grid.addWidget(authorEdit, 2, 1)
-
-        grid.addWidget(review, 3, 0)
-        grid.addWidget(reviewEdit, 3, 1, 5, 1)
-
-        self.setLayout(grid)
-
-        self.setGeometry(300, 300, 350, 300)
-        self.setWindowTitle('Review')
-        self.show()
+        super(Window, self).__init__(None)
+        layout = QHBoxLayout()
+        self.button = QPushButton('click')
+        layout.addWidget(self.button)
+        self.setLayout(layout)
+        self.button.clicked.connect(self.ask_filename)
+    def ask_filename(self):
+        fname = QFileDialog.getSaveFileName(self, 'title')
+        print(fname)
+        self.button.setText(fname[0])
 
 
-if __name__ == '__main__':
-
-    app = QApplication(sys.argv)
-    ex = Example()
-    sys.exit(app.exec_())
+app = QApplication([])
+window = Window()
+window.show()
+app.exec_()

@@ -20,35 +20,37 @@ class Example(QMainWindow):
 		# self.setToolTip('This is the <b>ELF</b> widget')
 		self.statusBar().showMessage('Ready')
 
-		menubar = self.menuBar()
-		fileMenu = menubar.addMenu('&File')
+		self.menubar = self.menuBar()
+		self.fileMenu = self.menubar.addMenu('&File')
 
-		exitAction = QAction('&Rage Quit!1', self)
-		exitAction.setShortcut('Ctrl+Q')
-		exitAction.triggered.connect(self.closeEvent)
-		exitAction.setStatusTip('Leave the app')
-		fileMenu.addAction(exitAction)
+		self.openFile = QAction('Open', self)
+		self.openFile.setShortcut('Ctrl+O')
+		self.openFile.setStatusTip('Load data')
+		self.openFile.triggered.connect(self.load_file)
+		self.fileMenu.addAction(self.openFile)
 
-		openFile = QAction('Open', self)
-		openFile.setShortcut('Ctrl+O')
-		openFile.setStatusTip('Load data')
-		openFile.triggered.connect(self.load_file)
-		fileMenu.addAction(openFile)
+		self.exitAction = QAction('&Rage Quit!1', self)
+		self.exitAction.setShortcut('Ctrl+Q')
+		self.exitAction.triggered.connect(self.closeEvent)
+		self.exitAction.setStatusTip('Leave the app')
+		self.fileMenu.addAction(self.exitAction)
 
-		load_btn = QPushButton('Load File', parent=self)
-		res_btn = QPushButton('Do research!', parent=self)
-		res_btn.resize(res_btn.sizeHint())  # recommended size
-		load_btn.resize(res_btn.sizeHint())
-		res_btn.move(0, 50)
-		load_btn.move(0, 25)
+		self.load_btn = QPushButton('Load File', parent=self)
+		self.res_btn = QPushButton('Do research!', parent=self)
+		self.res_btn.resize(self.res_btn.sizeHint())  # recommended size
+		self.load_btn.resize(self.res_btn.sizeHint())
+		self.res_btn.move(0, 50)
+		self.load_btn.move(0, 25)
 
-		res_btn.clicked.connect(lesya_write_cod_function)
-		load_btn.clicked.connect(self.load_file)
+		self.res_btn.clicked.connect(lesya_write_cod_function)
+		self.load_btn.clicked.connect(self.load_file)
+
+		self.topFileName = QLabel(self)
+		self.topFileName.move(75, 30)
 
 		self.setFixedSize(300, 240)
 		self.setWindowTitle('ELF Data GUI')
 		self.setWindowIcon(QIcon('icon.png'))
-		self.show()
 
 	def closeEvent(self, event):  # it is template QWidget function
 		reply = QMessageBox.question(self, 'Message',
@@ -60,12 +62,18 @@ class Example(QMainWindow):
 			event.ignore()
 
 	def load_file(self):
-		fname = QFileDialog.getOpenFileName(self, 'Load data')[0]
-		with open(fname, 'r') as f:
-			data = f.read()
+		fname = QFileDialog.getOpenFileName(self, 'Load data')[0].split('/')
+		fname = fname[len(fname)-1]
+		if fname:
+			self.topFileName.setText('Loaded data file is <b>' + fname + '</b>')
+			self.topFileName.resize(self.topFileName.sizeHint())
+			with open(fname, 'r') as f:
+				pass
+		else:
 			pass
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	ex = Example()
+	ex.show()
 	sys.exit(app.exec_())
