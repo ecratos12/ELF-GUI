@@ -26,7 +26,6 @@ class Example(QMainWindow):
 		self.interface = QWidget(
 			self)  # grid layout don't working with QMainWindow, so I attached all buttons, labels, etc.. to @interface
 		self.init_ui()
-		self.data = pd.read_csv('C:/Users/Максим Васюта/Desktop/new article/figures/3comp', delimiter=' ', header=None)
 
 	def init_ui(self):
 		self.statusBar().showMessage('Ready')
