@@ -6,8 +6,7 @@ from PyQt5.QtGui import QIcon
 # from PyQt5.QtCore import QCoreApplication
 
 
-def lesya_write_cod_function():
-	print('research done, congrats!')
+
 
 
 class Example(QMainWindow):
@@ -42,11 +41,20 @@ class Example(QMainWindow):
 		self.res_btn.move(0, 50)
 		self.load_btn.move(0, 25)
 
-		self.res_btn.clicked.connect(lesya_write_cod_function)
+		self.res_btn.clicked.connect(self.lesya_write_cod_function)
 		self.load_btn.clicked.connect(self.load_file)
 
 		self.topFileName = QLabel(self)
 		self.topFileName.move(75, 30)
+
+		self.result_log = QLabel(self)
+		self.result_log.move(75, 55)
+
+		grid = QGridLayout(self)
+		grid.setSpacing(10)
+		grid.addWidget(self.load_btn, 0, 0)
+		grid.addWidget(self.res_btn, 1, 0)
+		grid.addWidget(self.topFileName, 0, 1)
 
 		self.setFixedSize(300, 240)
 		self.setWindowTitle('ELF Data GUI')
@@ -71,6 +79,11 @@ class Example(QMainWindow):
 				pass
 		else:
 			pass
+
+	def lesya_write_cod_function(self):
+		self.result_log.setText('<b>research done, congrats!</b>')
+		self.result_log.resize(self.result_log.sizeHint())
+
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
