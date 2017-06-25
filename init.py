@@ -65,7 +65,7 @@ class Example(QMainWindow):
 		fname = QFileDialog.getOpenFileName(self, 'Load data')[0].split('/')
 		fname = fname[len(fname)-1]
 		if fname:
-			self.topFileName.setText('Loaded data file is <b>' + fname + '</b>')
+			self.topFileName.setText('Loaded data file is <b>' + fname + '</b>')  #
 			self.topFileName.resize(self.topFileName.sizeHint())
 			with open(fname, 'r') as f:
 				pass
