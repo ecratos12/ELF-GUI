@@ -1,7 +1,9 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QAction, QMainWindow, QPushButton, QMessageBox)
+from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout,
+							 QAction, QMainWindow, QPushButton,
+							 QMessageBox, QFileDialog)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QCoreApplication
+# from PyQt5.QtCore import QCoreApplication
 
 
 def lesya_write_cod_function():
@@ -20,11 +22,18 @@ class Example(QMainWindow):
 
 		menubar = self.menuBar()
 		fileMenu = menubar.addMenu('&File')
-		exitAction = QAction("&Rage Quit!1", self)
-		exitAction.setShortcut("Ctrl+Q")
+
+		exitAction = QAction('&Rage Quit!1', self)
+		exitAction.setShortcut('Ctrl+Q')
 		exitAction.triggered.connect(self.closeEvent)
-		exitAction.setStatusTip("Leave the app")
+		exitAction.setStatusTip('Leave the app')
 		fileMenu.addAction(exitAction)
+
+		openFile = QAction('Open', self)
+		openFile.setShortcut('Ctrl+O')
+		openFile.setStatusTip('Load data')
+		openFile.triggered.connect(self.load_file)
+		fileMenu.addAction(openFile)
 
 		load_btn = QPushButton('Load File', parent=self)
 		res_btn = QPushButton('Do research!', parent=self)
@@ -34,6 +43,7 @@ class Example(QMainWindow):
 		load_btn.move(0, 25)
 
 		res_btn.clicked.connect(lesya_write_cod_function)
+		load_btn.clicked.connect(self.load_file)
 
 		self.setFixedSize(300, 240)
 		self.setWindowTitle('ELF Data GUI')
@@ -48,6 +58,12 @@ class Example(QMainWindow):
 			event.accept()
 		else:
 			event.ignore()
+
+	def load_file(self):
+		fname = QFileDialog.getOpenFileName(self, 'Load data')[0]
+		with open(fname, 'r') as f:
+			data = f.read()
+			pass
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
