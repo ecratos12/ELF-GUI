@@ -114,7 +114,7 @@ class PlotCanvas(FigureCanvas):
 		data = [random.random() for i in range(25)]
 		ax = self.figure.add_subplot(111)
 		ax.plot(data, 'r-')
-		ax.set_title('PyQt Matplotlib Example')
+		ax.set_title('Lol(kek)')
 		self.draw()
 
 
