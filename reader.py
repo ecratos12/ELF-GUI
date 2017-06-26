@@ -10,8 +10,10 @@ def read_data_from_file(file_name):
 	f.close()
 
 	f = open(file_name, "rb")
-	header = f.read(64)
+	header = str(f.read(64))
 	f.close()
+
+	header = header[2:header.find('\\')]
 
 	new_byte=[]                          #get 16-x code (2 bytes)
 
@@ -36,7 +38,7 @@ def read_data_from_file(file_name):
 		c2 =  int(time_s2,16)
 		chanel1.append(c1)
 		chanel2.append(c2)
-	#print(len(chanel1),len(chanel2))
+	print(len(chanel1),len(chanel2))
 	#print(chanel1)
 	#print(chanel2)
-	return chanel1, chanel2, header
+	return chanel1[:chanel1.index(0)], chanel2[:chanel2.index(0)], header

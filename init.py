@@ -90,7 +90,7 @@ class Example(QMainWindow):
 			fname = fname[len(fname) - 1]'''
 
 			self.chanel1, self.chanel2, self.header = reader.read_data_from_file(fname)
-
+			#print(self.chanel1, self.chanel2)
 			#self.interface.topFileName.setText('Loaded data file is <b>' + fname + '</b>')
 			self.interface.topFileName.resize(self.interface.topFileName.sizeHint())
 		else:
@@ -99,16 +99,17 @@ class Example(QMainWindow):
 	def plot(self):
 		# self.interface.result_log.setText('<b>research done, congrats!</b>')
 		# self.interface.result_log.resize(self.interface.result_log.sizeHint())
-		self.interface.graph = PlotCanvas(self.chanel1, self.chanel2, self.interface, width=4, height=3, dpi=100)
+		self.interface.graph = PlotCanvas(self.chanel1, self.chanel2, self.header, self.interface, width=4, height=3, dpi=100)
 		self.grid.addWidget(self.interface.graph, 0, 2, 3, 1)
 
 
 class PlotCanvas(FigureCanvas):
-	def __init__(self, chanel1, chanel2, parent=None, width=4, height=3, dpi=100):
+	def __init__(self, chanel1, chanel2, header, parent=None, width=4, height=3, dpi=100):
 		fig = Figure(figsize=(width, height), dpi=dpi)
 		self.axes = fig.add_subplot(111)
 		self.chanel1 = chanel1
 		self.chanel2 = chanel2
+		self.header = header
 		FigureCanvas.__init__(self, fig)
 		self.setParent(parent)
 		FigureCanvas.setSizePolicy(self,
@@ -118,13 +119,18 @@ class PlotCanvas(FigureCanvas):
 		self.plot()
 
 	def plot(self):
-		x = range(len(self.chanel1))
+		x = []
+		if len(self.chanel1)<53000:
+			for i in range(len(self.chanel1)):
+				x.append((i+1)/175.95)
+		else:
+			for i in range(len(self.chanel1)):
+				x.append((i+1)/887.7841)
 		# data = [random.random() for i in range(25)]
 		ax = self.figure.add_subplot(111)
-		ax.plot(x,self.chanel1)
+		ax.plot(x,self.chanel1, color='red')
 		ax.plot(x,self.chanel2)
-
-		ax.set_title('Lol(kek)')
+		ax.set_title(self.header)
 		self.draw()
 
 
