@@ -18,6 +18,9 @@ import matplotlib.pyplot as plt
 
 import random
 
+import reader
+
+
 
 class Example(QMainWindow):
 
@@ -82,10 +85,13 @@ class Example(QMainWindow):
 	def load_file(self):
 		fname = QFileDialog.getOpenFileName(self, 'Load data')[0]
 		if fname:
-			self.data = pd.read_csv(fname, delimiter=' ', header=None)
+			'''self.data = pd.read_csv(fname, delimiter=' ', header=None)
 			fname = fname.split('/')
-			fname = fname[len(fname) - 1]
-			self.interface.topFileName.setText('Loaded data file is <b>' + fname + '</b>')
+			fname = fname[len(fname) - 1]'''
+
+			self.chanel1, self.chanel2, self.header = reader.read_data_from_file(fname)
+
+			#self.interface.topFileName.setText('Loaded data file is <b>' + fname + '</b>')
 			self.interface.topFileName.resize(self.interface.topFileName.sizeHint())
 		else:
 			pass
@@ -93,15 +99,16 @@ class Example(QMainWindow):
 	def plot(self):
 		# self.interface.result_log.setText('<b>research done, congrats!</b>')
 		# self.interface.result_log.resize(self.interface.result_log.sizeHint())
-		self.interface.graph = PlotCanvas(self.interface, width=5, height=4)
+		self.interface.graph = PlotCanvas(self.chanel1, self.chanel2, self.interface, width=4, height=3, dpi=100)
 		self.grid.addWidget(self.interface.graph, 0, 2, 3, 1)
 
 
 class PlotCanvas(FigureCanvas):
-	def __init__(self, parent=None, width=5, height=4, dpi=100):
+	def __init__(self, chanel1, chanel2, parent=None, width=4, height=3, dpi=100):
 		fig = Figure(figsize=(width, height), dpi=dpi)
 		self.axes = fig.add_subplot(111)
-
+		self.chanel1 = chanel1
+		self.chanel2 = chanel2
 		FigureCanvas.__init__(self, fig)
 		self.setParent(parent)
 		FigureCanvas.setSizePolicy(self,
@@ -111,9 +118,12 @@ class PlotCanvas(FigureCanvas):
 		self.plot()
 
 	def plot(self):
-		data = [random.random() for i in range(25)]
+		x = range(len(self.chanel1))
+		# data = [random.random() for i in range(25)]
 		ax = self.figure.add_subplot(111)
-		ax.plot(data, 'r-')
+		ax.plot(x,self.chanel1)
+		ax.plot(x,self.chanel2)
+
 		ax.set_title('Lol(kek)')
 		self.draw()
 
