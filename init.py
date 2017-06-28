@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (QApplication,
 from PyQt5.QtGui import QIcon
 # from PyQt5.QtCore import QCoreApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolBar
 from matplotlib.figure import Figure
 import reader
 
@@ -39,8 +40,15 @@ class Example(QMainWindow):
 		exitAction = QAction('&Quit!1', self)
 		exitAction.setShortcut('Ctrl+Q')
 		exitAction.triggered.connect(self.closeEvent)
-		exitAction.setStatusTip('Leave the app')
+		exitAction.setStatusTip('Leave the program')
 		fileMenu.addAction(exitAction)
+
+		helpMenu = menubar.addMenu('&Help')
+		aboutAction = QAction('&About', self)
+		aboutAction.setShortcut('F1')
+		aboutAction.triggered.connect(self.on_about)
+		aboutAction.setStatusTip('About the program')
+		helpMenu.addAction(aboutAction)
 
 		# ----------------------
 		# setting the @interface
@@ -50,14 +58,16 @@ class Example(QMainWindow):
 		self.interface.load_btn = QPushButton('Load File', self.interface)
 		self.interface.plot_btn = QPushButton('Plot data', self.interface)
 		self.interface.topFileName = QLabel(self.interface)
-		self.interface.result_log = QLabel(self.interface)
+		self.interface.dataLabel = QLabel(self.interface)
+		self.interface.timeLabel = QLabel(self.interface)
 
 		self.grid = QGridLayout(self.interface)
-		self.grid.setSpacing(10)
+		self.grid.setSpacing(5)
 		self.grid.addWidget(self.interface.load_btn, 0, 0)
-		self.grid.addWidget(self.interface.plot_btn, 1, 0)
-		self.grid.addWidget(self.interface.topFileName, 0, 1)
-		self.grid.addWidget(self.interface.result_log, 1, 1)
+		self.grid.addWidget(self.interface.topFileName, 1, 0)
+		self.grid.addWidget(self.interface.plot_btn, 2, 0)
+		self.grid.addWidget(self.interface.dataLabel, 3, 0)
+		self.grid.addWidget(self.interface.timeLabel, 4, 0)
 		self.setLayout(self.grid)
 
 		self.interface.plot_btn.clicked.connect(self.plot)
@@ -80,35 +90,49 @@ class Example(QMainWindow):
 	def load_file(self):
 		fname = QFileDialog.getOpenFileName(self, 'Load data')[0]
 		if fname:
-			# self.data = pd.read_csv(fname, delimiter=' ', header=None)
 			self.channel1, self.channel2, self.header = reader.read_data_from_file(fname)
 			fname = fname.split('/')
 			fname = fname[len(fname) - 1]
-			self.interface.topFileName.setText('Loaded data: <b>' + fname + '</b>. Size: <b>'
+			self.interface.topFileName.setText('Loaded data: <b>' + fname + '</b>. Rows: <b>'
 											   + str(len(self.channel1)) + '</b>')
 			self.interface.topFileName.resize(self.interface.topFileName.sizeHint())
+			self.interface.dataLabel.setText('DATE: <b>' + fname[:8] + '</b>')
+			self.interface.dataLabel.resize(self.interface.dataLabel.sizeHint())
+			self.interface.timeLabel.setText('TIME: <b>' + fname[8:10] + ':' + fname[10:12] + '</b>')
+			self.interface.timeLabel.resize(self.interface.timeLabel.sizeHint())
+
 		else:
 			pass
 
 	def plot(self):
-		# self.interface.result_log.setText('<b>research done, congrats!</b>')
-		# self.interface.result_log.resize(self.interface.result_log.sizeHint())
-		self.interface.graph = PlotCanvas(self.channel1, self.channel2, self.header, self.interface)
-		self.grid.addWidget(self.interface.graph, 0, 2, 3, 1)
+		self.interface.graph = PlotCanvas(self.channel1, self.channel2, self.header, self.interface, width=16, height=12)
+		self.interface.plotToolBar = NavigationToolBar(self.interface.graph, self.interface)
+		self.grid.addWidget(self.interface.graph, 0, 1, 10, 1)
+		self.grid.addWidget(self.interface.plotToolBar, 10, 1)
+
+	def on_about(self):
+		msg = """
+Gorgeous
+Edi
+To
+R
+En
+Krakow
+Telescope
+		"""
+		QMessageBox.about(self, "About the ELF-gui", msg.strip())
 
 
 class PlotCanvas(FigureCanvas):
 	def __init__(self, channel1, channel2, header, parent=None, width=4, height=3, dpi=100):
-		fig = Figure(figsize=(width, height), dpi=dpi)
-		self.axes = fig.add_subplot(111)
+		self.figure = Figure(figsize=(width, height), dpi=dpi)
 		self.channel1 = channel1
 		self.channel2 = channel2
 		self.header = header
-		FigureCanvas.__init__(self, fig)
+		FigureCanvas.__init__(self, self.figure)
+		self.mpl_connect('motion_notify_event', self.onMotion)
 		self.setParent(parent)
-		FigureCanvas.setSizePolicy(self,
-								   QSizePolicy.Expanding,
-								   QSizePolicy.Expanding)
+		FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding, QSizePolicy.Expanding)
 		FigureCanvas.updateGeometry(self)
 		self.plot()
 
@@ -120,11 +144,22 @@ class PlotCanvas(FigureCanvas):
 		else:
 			for i in range(len(self.channel1)):
 				x.append((i+1)/887.7841)
-		ax = self.figure.add_subplot(111)
-		ax.plot(x, self.channel1, color='red')
-		ax.plot(x, self.channel2)
-		ax.set_title(self.header)
+		self.ax1 = self.figure.add_subplot(211)
+		self.ax1.clear()
+		self.ax1.grid()
+		self.ax1.plot(x, self.channel1, color='red')
+		self.ax1.plot(x, self.channel2)
+		# self.ax1.set_title(self.header)
+		self.ax2 = self.figure.add_subplot(212)
+		self.ax2.clear()
+		self.ax2.grid()
+		self.ax2.plot(x, self.channel1, color='red')
+		self.ax2.plot(x, self.channel2)
+		self.figure.tight_layout(pad=1.6)
 		self.draw()
+
+	def onMotion(self, event):
+		self.parent().parent().statusBar().showMessage('%.6s, %.8s' %(event.xdata, event.ydata))
 
 
 if __name__ == '__main__':
