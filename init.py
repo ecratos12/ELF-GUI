@@ -149,7 +149,6 @@ class PlotCanvas(FigureCanvas):
 		self.ax1.grid()
 		self.ax1.plot(x, self.channel1, color='red')
 		self.ax1.plot(x, self.channel2)
-		# self.ax1.set_title(self.header)
 		self.ax2 = self.figure.add_subplot(212)
 		self.ax2.clear()
 		self.ax2.grid()
