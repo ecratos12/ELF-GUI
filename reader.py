@@ -34,5 +34,5 @@ def read_data_from_file(file_name):
 		c2 = int(time_s2, 16)
 		channel1.append(c1)
 		channel2.append(c2)
-	# print(len(channel1),len(channel2))
+	# print(len(channel1_1),len(channel1_2))
 	return channel1[:channel1.index(0)], channel2[:channel2.index(0)], header

@@ -88,24 +88,36 @@ class Example(QMainWindow):
 			event.ignore()
 
 	def load_file(self):
-		fname = QFileDialog.getOpenFileName(self, 'Load data')[0]
-		if fname:
-			self.channel1, self.channel2, self.header = reader.read_data_from_file(fname)
-			fname = fname.split('/')
-			fname = fname[len(fname) - 1]
-			self.interface.topFileName.setText('Loaded data: <b>' + fname + '</b>. Rows: <b>'
-											   + str(len(self.channel1)) + '</b>')
+		fname1 = QFileDialog.getOpenFileName(self, 'Load data')[0]
+		if fname1:
+			self.channel1_1, self.channel1_2, self.header1 = reader.read_data_from_file(fname1)
+			fname1 = fname1.split('/')
+			fname2 = fname1
+			if fname1[-2] == '7':
+					fname2[-2] = '10'
+			else:
+				fname2[-2] = '7'
+			fname2 = '/'.join(fname2)
+			self.channel2_1, self.channel2_2, self.header2 = reader.read_data_from_file(fname2)
+			fname1 = fname1[-1]
+
+			self.interface.topFileName.setText('Loaded data: <b>' + fname1 + '</b>. Rows: <b>'
+											   + str(len(self.channel1_1)) + '/' + str(len(self.channel2_1)) + '</b>')
 			self.interface.topFileName.resize(self.interface.topFileName.sizeHint())
-			self.interface.dataLabel.setText('DATE: <b>' + fname[:8] + '</b>')
+			self.interface.dataLabel.setText('DATE: <b>' + fname1[:8] + '</b>')
 			self.interface.dataLabel.resize(self.interface.dataLabel.sizeHint())
-			self.interface.timeLabel.setText('TIME: <b>' + fname[8:10] + ':' + fname[10:12] + '</b>')
+			self.interface.timeLabel.setText('TIME: <b>' + fname1[8:10] + ':' + fname1[10:12] + '</b>')
 			self.interface.timeLabel.resize(self.interface.timeLabel.sizeHint())
 
 		else:
 			pass
 
 	def plot(self):
-		self.interface.graph = PlotCanvas(self.channel1, self.channel2, self.header, self.interface, width=16, height=12)
+		self.interface.plotToolBar = None
+		self.interface.graph = PlotCanvas(self.channel1_1, self.channel1_2,
+										  self.channel2_1, self.channel2_2,
+										  self.header1, self.header2,
+										  self.interface, width=16, height=12)
 		self.interface.plotToolBar = NavigationToolBar(self.interface.graph, self.interface)
 		self.grid.addWidget(self.interface.graph, 0, 1, 10, 1)
 		self.grid.addWidget(self.interface.plotToolBar, 10, 1)
@@ -124,11 +136,14 @@ Telescope
 
 
 class PlotCanvas(FigureCanvas):
-	def __init__(self, channel1, channel2, header, parent=None, width=4, height=3, dpi=100):
+	def __init__(self, channel1_1, channel1_2, channel2_1, channel2_2, header1, header2, parent=None, width=4, height=3, dpi=100):
 		self.figure = Figure(figsize=(width, height), dpi=dpi)
-		self.channel1 = channel1
-		self.channel2 = channel2
-		self.header = header
+		self.channel1_1 = channel1_1
+		self.channel1_2 = channel1_2
+		self.channel2_1 = channel2_1
+		self.channel2_2 = channel2_2
+		self.header1 = header1
+		self.header2 = header2
 		FigureCanvas.__init__(self, self.figure)
 		self.mpl_connect('motion_notify_event', self.onMotion)
 		self.setParent(parent)
@@ -137,23 +152,29 @@ class PlotCanvas(FigureCanvas):
 		self.plot()
 
 	def plot(self):
-		x = []
-		if len(self.channel1) < 53000:
-			for i in range(len(self.channel1)):
-				x.append((i+1)/175.95)
+		x1 = []
+		x2 = []
+		if len(self.channel1_1) < 53000:
+			for i in range(len(self.channel1_1)):
+				x1.append((i+1)/175.95)
+			for i in range(len(self.channel2_1)):
+				x2.append((i + 1)/887.7841)
 		else:
-			for i in range(len(self.channel1)):
-				x.append((i+1)/887.7841)
+			for i in range(len(self.channel1_1)):
+				x1.append((i+1)/887.7841)
+			for i in range(len(self.channel2_1)):
+				x2.append((i + 1)/175.95)
+
 		self.ax1 = self.figure.add_subplot(211)
 		self.ax1.clear()
 		self.ax1.grid()
-		self.ax1.plot(x, self.channel1, color='red')
-		self.ax1.plot(x, self.channel2)
+		self.ax1.plot(x1, self.channel1_1, color='red')
+		self.ax1.plot(x1, self.channel1_2)
 		self.ax2 = self.figure.add_subplot(212)
 		self.ax2.clear()
 		self.ax2.grid()
-		self.ax2.plot(x, self.channel1, color='red')
-		self.ax2.plot(x, self.channel2)
+		self.ax2.plot(x2, self.channel2_1, color='red')
+		self.ax2.plot(x2, self.channel2_2)
 		self.figure.tight_layout(pad=1.6)
 		self.draw()
 
