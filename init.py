@@ -124,13 +124,10 @@ class Example(QMainWindow):
 
 	def on_about(self):
 		msg = """
-Gorgeous
-Edi
-To
-R
-En
-Krakow
-Telescope
+v1.0
+TODO:
+	1. Enable file streaming from the ELF data centre
+	2. Provide kinds of analysis
 		"""
 		QMessageBox.about(self, "About the ELF-gui", msg.strip())
 
