@@ -153,14 +153,14 @@ class PlotCanvas(FigureCanvas):
 		x2 = []
 		if len(self.channel1_1) < 53000:
 			for i in range(len(self.channel1_1)):
-				x1.append((i+1)/175.95)
+				x1.append((i)/175.95)
 			for i in range(len(self.channel2_1)):
-				x2.append((i + 1)/887.7841)
+				x2.append((i)/887.7841)
 		else:
 			for i in range(len(self.channel1_1)):
-				x1.append((i+1)/887.7841)
+				x1.append((i)/887.7841)
 			for i in range(len(self.channel2_1)):
-				x2.append((i + 1)/175.95)
+				x2.append((i)/175.95)
 
 		self.ax1 = self.figure.add_subplot(211)
 		self.ax1.clear()
