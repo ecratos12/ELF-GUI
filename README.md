@@ -15,3 +15,4 @@ PyQt5 + Matplotlib ELF's data viewer
 4. Open some Elf's data file. Top plot is the data you opened, bottom plot is the self-titled file from another folder.
 
 
+**Warning!** Format all data files names as `yyyymmddhhmm.dat`.
